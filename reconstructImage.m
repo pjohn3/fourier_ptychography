@@ -70,8 +70,9 @@ function objectRecover = reconstructImage(LEDgap, LEDheight, arraysize, waveleng
     seq = gseq(arraysize); % define the order of recovery, we start from the center (the 113th image) to the edge of the spectrum (the 225th image)
     objectRecover = ones(m, n); % initial guess of the object
     objectRecoverFT = fftshift(fft2(objectRecover));
-    loop = 5;
-
+    loop = 25;
+    pupil = 1;
+    
     for tt=1:loop
         for i3=1:arraysize^2
             i2=seq(i3);
@@ -79,11 +80,12 @@ function objectRecover = reconstructImage(LEDgap, LEDheight, arraysize, waveleng
             kyc = round((m+1)/2+ky(1,i2)/dky); 
             kyl=round(kyc-(m1-1)/2);kyh=round(kyc+(m1-1)/2); 
             kxl=round(kxc-(n1-1)/2);kxh=round(kxc+(n1-1)/2);
-            lowResFT = (m1/m)^2 * objectRecoverFT(kyl:kyh,kxl:kxh).*CTF; 
-            im_lowRes = ifft2(ifftshift(lowResFT));
-            im_lowRes = (m/m1)^2 *imresize(imSeqLowRes(:,:,i2), [m1, n1]).*exp(1i.*angle( im_lowRes)); 
-            lowResFT=fftshift(fft2(im_lowRes)).*CTF;
-            objectRecoverFT(kyl:kyh,kxl:kxh)=(1-CTF).*objectRecoverFT(kyl:kyh,kxl:kxh) + lowResFT;
+            lowResFT_1 = (m1/m)^2 * objectRecoverFT(kyl:kyh,kxl:kxh).*CTF.*pupil; 
+            im_lowRes = ifft2(ifftshift(lowResFT_1));
+            im_lowRes = (m/m1)^2 *imresize(imSeqLowRes(:,:,i2), [m1, n1]).*exp(1i.*angle( im_lowRes));             
+            lowResFT_2=fftshift(fft2(im_lowRes)).*CTF.*(1./pupil); 
+            objectRecoverFT(kyl:kyh,kxl:kxh) = objectRecoverFT(kyl:kyh, kxl:kxh) + conj(pupil)./(max(max(abs(pupil).^2))) .* (lowResFT_2 - lowResFT_1);
+            pupil = pupil + conj(objectRecoverFT(kyl:kyh,kxl:kxh))./(max(max(abs(objectRecoverFT(kyl:kyh,kxl:kxh)).^2))).*(lowResFT_2 - lowResFT_1);
         end;
     end;
     objectRecover=ifft2(ifftshift(objectRecoverFT));    

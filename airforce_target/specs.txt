@@ -1,0 +1,8 @@
+pixel clock = 21 mhz
+frame rate = 6.36
+exposure time = 143.04 ms
+gain = 7.4x
+redlight
+na = .12
+height from led to sample = 92 mm
+height from sample to lens = 30 mm

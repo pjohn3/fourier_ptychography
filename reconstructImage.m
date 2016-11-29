@@ -41,7 +41,7 @@ function objectRecover = reconstructImage(LEDgap, LEDheight, arraysize, waveleng
     [m1, n1] = size(imSeqLowRes(:,:,1));
     m = ceil((spsize / psize) * m1);
     n = ceil((spsize / psize) * n1);
-    [kxm, kym] = meshgrid(-kmax:kmax / ((n1 - 1)/2):kmax, -kmax:kmax/((n1 - 1) / 2):kmax);
+    [kxm, kym] = meshgrid(-kmax:kmax / ((n1 - 1)/2):kmax, -kmax:kmax/((m1 - 1) / 2):kmax);
     CTF = ((kxm.^2+kym.^2)<cutoffFrequency^2); % Coherent Transfer function. 
     
     % With the above psize explanation, we ensure that an arbitrary kx and ky
